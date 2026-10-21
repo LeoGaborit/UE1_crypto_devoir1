@@ -10,7 +10,7 @@ def aes_cbc_encrypt(plaintext: bytes, key: bytes) -> tuple[bytes, bytes]:
     enc = Cipher(algorithms.AES(key), modes.CBC(iv)).encryptor()
     return iv, enc.update(padded) + enc.finalize()
 
-def aes_cbc_decrypt(iv: bytes, ciphertext: bytes, key: bytes) -> str:
+def aes_cbc_decrypt(iv: bytes, ciphertext: bytes, key: bytes) -> bytes:
     dec = Cipher(algorithms.AES(key), modes.CBC(iv)).decryptor()
     padded = dec.update(ciphertext) + dec.finalize()
     unpadder = padding.PKCS7(128).unpadder()   # retire le padding
