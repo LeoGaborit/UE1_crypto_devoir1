@@ -54,5 +54,18 @@ class MyTestCase(unittest.TestCase):
 
         self.assertEqual(message, received_message)
 
+    def test_messenger_with_invalid_hmac(self):
+        # Test the receive_message function with an invalid HMAC
+        from messenger import send_message, receive_message
+        private_key, public_key = generer_paire_rsa()
+        message = b"Message a envoyer"
+
+        packet = send_message(message, public_key)
+        # Tamper with the HMAC to simulate an invalid HMAC
+        packet["hmac"] = b"invalid_hmac"
+
+        with self.assertRaises(ValueError):
+            receive_message(packet, private_key)
+
 if __name__ == '__main__':
     unittest.main()
