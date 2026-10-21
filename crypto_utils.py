@@ -1,6 +1,7 @@
 import os
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import padding
+import hmac, hashlib
 
 def aes_cbc_encrypt(plaintext: bytes, key: bytes) -> tuple[bytes, bytes]:
     iv = os.urandom(16)                    # nouvel IV à chaque appel
@@ -17,6 +18,19 @@ def aes_cbc_decrypt(iv: bytes, ciphertext: bytes, key: bytes) -> str:
 
 def compute_hmac(hmac_key, data) -> bytes:
     """ Generate HMAC """
+    mac = hmac.new(hmac_key, data, hashlib.sha256).digest()
+    return mac
 
-def verify_hmac(hmac_key, data, mac) -> bytes:
+def verify_hmac(hmac_key, data, mac) -> bool:
     """ Verify HMAC """
+    recieved_verification = hmac.new(hmac_key, data, hashlib.sha256).digest()
+    verification = hmac.compare_digest(recieved_verification, mac)
+    return verification
+
+# HMAC verification test
+# key = os.urandom(32)
+# message = b"Transfert 1000 euros a Bob"
+# send_hmac = compute_hmac(key, message)
+# recv_hmac = verify_hmac(key, message, send_hmac)
+# print(recv_hmac)
+
