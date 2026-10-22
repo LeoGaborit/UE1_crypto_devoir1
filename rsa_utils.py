@@ -12,16 +12,18 @@ def generer_paire_rsa() -> tuple[rsa.RSAPrivateKey, rsa.RSAPublicKey]:
     public_key = private_key.public_key()
     return private_key, public_key
 
+
 def rsa_chiffrer_cle(cles: bytes, rsa_public_key: rsa.RSAPublicKey) -> bytes:
     """ Chiffrer clé par RSA """
     oaep = padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                        algorithm=hashes.SHA256(),label=None)
+                        algorithm=hashes.SHA256(), label=None)
     chiffre = rsa_public_key.encrypt(cles, oaep)
     return chiffre
+
 
 def rsa_dechiffrer_cle(cles_chiffrees: bytes, rsa_private_key: rsa.RSAPrivateKey) -> bytes:
     """ Déchiffrer clé par RSA """
     oaep = padding.OAEP(mgf=padding.MGF1(algorithm=hashes.SHA256()),
-                        algorithm=hashes.SHA256(),label=None)
+                        algorithm=hashes.SHA256(), label=None)
     dechiffre = rsa_private_key.decrypt(cles_chiffrees, oaep)
     return dechiffre
