@@ -1,7 +1,8 @@
 import os
 import subprocess
 
-from messenger import send_message, receive_message
+import messenger
+import rsa_utils
 
 def consoleClear():
     subprocess.run("cls" if os.name == "nt" else "clear", shell=True)
@@ -111,16 +112,111 @@ def main():
             print("\n")
             input("\t- Appuyez sur Entrée pour revenir au menu principal ")
 
+        if choix == 2:
+            choix = 0
 
+            intercept : int
+            message : str
+            paquet : dict
 
+            print("\t ~ Mode Express activé ! ~")
+            print("")
+            print("\t Le mode express va montrer un échange interactif sécurisé entre vous et Bob ")
+            print("")
+            print("\t Voulez vous que l'échange soit intercepté et modifié ? (test itégrité HMAC) ")
+            print("\t 1 = Oui | 2 = Non\n")
+            intercept = int(input("\t - Votre choix : "))
 
+            consoleClear()
 
+            print("\t [Bob] Génération des clés RSA...\n")
+            private_key, public_key = rsa_utils.generer_paire_rsa()
 
+            message = input("\t- Veuillez rentrer un message à transmettre à Bob : ")
+            paquet = messenger.send_message(message.encode(), public_key)
+            print("\n\t [Vous] Envoi du message : " + message)
 
+            print("")
+
+            if intercept == 1:
+                print("\t [Eve] Interception du message !")
+                print("\t [Eve] Modification du message... \n")
+                paquet["ciphertext"] = b"message modifie"
+                paquet["hmac"] = b"invalid_hmac"
+
+            try:
+                messenger.receive_message(paquet, private_key)
+            except ValueError as _:
+                print(f"\t [Bob] ALERTE : HMAC invalide, message rejeté")
+                print("\t [OK] Manipulation détectée")
+            else:
+                print("\t [Bob] Message reçu avec succès : " + message)
+                print("\t [OK] Message identique")
+
+            input("\n Appuyez sur [Entrée] pour continuer")
+
+        if choix == 3:
+            choix = 0
+
+            print("\t                ~ Mode Apprentissage activé ! ~                ")
+            print("")
+            print("\t Dans ce mode, nous allons découvrir les trois outils utilisés ")
+            print("\t         pour protéger les messages : AES, RSA et HMAC.        ")
+            print("\n")
+            input("\t - Appuyez sur Entrée pour continuer... ")
+
+            consoleClear()
+
+            print("\t         ~ AES : chiffrer le contenu du message ~         ")
+            print("")
+            print("\t AES est une méthode de chiffrement symétrique : Alice et Bob ")
+            print("\t   utilisent la même clé secrète pour chiffrer et déchiffrer. ")
+            print("")
+            print("\t Sans cette clé, le message chiffré ressemble à du charabia ")
+            print("\t  et ne peut pas être compris par une personne extérieure.  ")
+            print("\n")
+            input("\t - Appuyez sur Entrée pour continuer... ")
+
+            consoleClear()
+
+            print("\t            ~ RSA : partager les clés de manière sécurisée ~            ")
+            print("")
+            print("\t       RSA est une méthode de chiffrement asymétrique qui utilise       ")
+            print("\t             une paire de clés liées l'une à l'autre.                   ")
+            print("")
+            print("\t    La clé publique peut être partagée pour chiffrer une clé secrète.   ")
+            print("\t      Seule la clé privée correspondante peut alors la déchiffrer.      ")
+            print("\t Dans notre messagerie, RSA protège les clés utilisées par AES et HMAC. ")
+            print("\n")
+            input("\t - Appuyez sur Entrée pour continuer... ")
+
+            consoleClear()
+
+            print("\t          ~ HMAC : vérifier l'intégrité et l'authenticité ~           ")
+            print("")
+            print("\t HMAC est un code calculé à partir d'un message et d'une clé secrète. ")
+            print("\t    Le destinataire recalcule ce code et le compare à celui reçu.     ")
+            print("")
+            print("\t           Si le message a été modifié, les deux codes HMAC           ")
+            print("\t            ne correspondent plus et le message est rejeté.           ")
+            print("")
+            print("\t   HMAC ne chiffre pas le message : il sert à vérifier qu'il n'a pas  ")
+            print("\t        été modifié en cours de route et qu'il est authentique.       ")
+            print("\n")
+            input("\t - Appuyez sur Entrée pour continuer... ")
+
+            consoleClear()
+
+            print("\t        ~ Comment ces outils travaillent ensemble ~       ")
+            print("")
+            print("\t   AES chiffre le message, RSA protège les clés secrètes, ")
+            print("\t       et HMAC permet de détecter toute modification.     ")
+            print("")
+            print("\t  Chacun a donc un rôle différent pour protéger l'échange.")
+            print("\n")
+            input("\t - Appuyez sur Entrée pour revenir au menu principal ")
 
     print("\t ~ Vous avez quitté le programme. A bientôt ! ~ \n")
-
-
 
 if __name__ == "__main__":
     main()
