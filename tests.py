@@ -1,4 +1,5 @@
 import unittest
+
 from crypto_utils import aes_cbc_decrypt, aes_cbc_encrypt
 from rsa_utils import generer_paire_rsa, rsa_chiffrer_cle, rsa_dechiffrer_cle
 
@@ -66,6 +67,7 @@ class MyTestCase(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             receive_message(packet, private_key)
+
 
 if __name__ == '__main__':
     unittest.main()
